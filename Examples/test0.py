@@ -10,7 +10,7 @@ from prism_rules import PrismRules
 data    = datasets.load_wine()
 df      = pd.DataFrame(data.data, columns=data.feature_names)
 df['Y'] = data['target']
-# display(df.head())
+
 
 print( df.info() )
 
