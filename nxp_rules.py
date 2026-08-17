@@ -15,6 +15,7 @@ def nxp_prism__bin_rules( terms_list, prism ):
         bin_rule_str += txt
     return bin_rule_str
 
+
 def nxp_prism_rule( target_col, target_val, terms_list, prism ):
     rule_str = '#+BEGIN_RULE\n'
     for term in terms_list:
