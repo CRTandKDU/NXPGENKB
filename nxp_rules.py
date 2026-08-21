@@ -8,8 +8,8 @@ def nxp_prism__bin_rules( terms_list, prism ):
         inf = prism.bin_ranges[ term[0] ][idx]
         sup = prism.bin_ranges[ term[0] ][idx + 1]
         txt = '\n#+BEGIN_RULE\n'
-        txt += f'!{term[0]} s( {inf:.2f}) f>\n'
-        txt += f'!{term[0]} s( {sup:.2f}) f<\n'
+        txt += f'!{term[0]} nxp@ s( {inf:.2f}) nxp2f f>\n'
+        txt += f'!{term[0]} nxp@ s( {sup:.2f}) nxp2f f<\n'
         txt += 'THEN {}_{}\n'.format( str(term[0]), str(term[1]) )
         txt += '#+END_RULE\n'
         bin_rule_str += txt
