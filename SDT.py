@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+import matplotlib.pyplot as plt
+
 
 class SDT(nn.Module):
     """Fast implementation of soft decision tree in PyTorch.
@@ -186,12 +188,61 @@ class SDT_MNIST( SDT ):
                           lamda,
                           use_cuda )
             
-        def plot( self, output, batch_size ):
-            print( "Plot:", self.inner_nodes )
-            print( "Plot:", self.leaf_nodes.weight )
-            begin_idx = 0
-            end_idx = 1
-            for layer_idx in range(0, self.depth):
-                #
-                begin_idx = end_idx
-                end_idx = begin_idx + 2 ** (layer_idx + 1)
+        def plot( self, output, batch_size ) -> None:
+            X_copy = self.leaf_nodes.weight.clone().to("cpu").detach()
+            print( X_copy.size() )
+            leaves = X_copy.size()[1]
+            x      = range( X_copy.size()[0] )
+            y1, y2 = X_copy[:, 0], X_copy[:, 1]
+            #
+            fig, _axes = plt.subplots(leaves, 1)
+            fig.suptitle( f'A tale of {leaves} leaves')
+            for leaf in range( leaves ):
+                _axes[leaf].bar( x, X_copy[:, leaf], .9 )
+                _axes[leaf].set_ylabel('Probability')
+                _axes[leaf].set_xticks( x )
+
+            _axes[leaf].set_xlabel('Target Class')
+
+            plt.show()
+            
+            # print( "Plot:", self.inner_nodes[0] )
+            # print( "Plot:", self.leaf_nodes.weight )
+            # begin_idx = 0
+            # end_idx = 1
+            # for layer_idx in range(0, self.depth):
+            #     #
+            #     begin_idx = end_idx
+            #     end_idx = begin_idx + 2 ** (layer_idx + 1)
+
+        # Source - https://stackoverflow.com/a/79815758
+        # Posted by Luca, modified by community. See post 'Timeline' for change history
+        # Retrieved 2026-08-22, License - CC BY-SA 4.0
+        def plot_tensor(self, X: Tensor) -> None:
+            X_copy = X.clone().to("cpu").detach()
+            print(f"The input tensor contains {X_copy.shape[0]} points in {X_copy.shape[1]} dimensions")
+            print(X_copy.tolist())
+            print(f"Tensor on device {X.device}, shape {X.shape}, type {X.dtype} ")
+    
+            if X.shape[1] == 1:
+                plt.scatter(X_copy[:, 0], np.zeros_like(X_copy[:, 0]))
+                plt.title("1D Tensor Values")
+                plt.xlabel("X1")
+                plt.ylabel("Value")  
+
+            if X.shape[1] == 2:
+                plt.scatter(X_copy[:, 0], X_copy[:, 1])
+                plt.title("2D Tensor Values")
+                plt.xlabel("X1")
+                plt.ylabel("X2")
+
+            if X.shape[1] == 3:
+                fig = plt.figure()
+                ax = fig.add_subplot(projection='3d')
+                ax.scatter(X_copy[:, 0], X_copy[:, 1], X_copy[:, 2])
+                ax.set_title("3D Tensor Values")
+                ax.set_xlabel("X1")
+                ax.set_ylabel("X2")
+                ax.set_zlabel("X3")
+
+            plt.show()

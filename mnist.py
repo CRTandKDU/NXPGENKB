@@ -21,7 +21,7 @@ if __name__ == "__main__":
     # Parameters
     input_dim = 28 * 28    # the number of input dimensions
     output_dim = 10        # the number of outputs (i.e., # classes on MNIST)
-    depth = 1              # tree depth
+    depth = 2              # tree depth, usually 5 to 7
     lamda = 1e-3           # coefficient of the regularization term
     lr = 1e-3              # learning rate
     weight_decaly = 5e-4   # weight decay
@@ -89,7 +89,6 @@ if __name__ == "__main__":
 
             # Print training status
             if batch_idx % log_interval == 0:
-                tree.plot( output, batch_size )
                 pred = output.data.max(1)[1]
                 correct = pred.eq(target.view(-1).data).sum()
 
@@ -99,6 +98,8 @@ if __name__ == "__main__":
                 )
                 print(msg.format(epoch, batch_idx, batch_size, loss, correct, batch_size))
                 training_loss_list.append(loss.cpu().data.numpy())
+
+        tree.plot( output, batch_size )
 
         # Evaluating
         tree.eval()
