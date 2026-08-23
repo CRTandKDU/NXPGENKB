@@ -187,7 +187,21 @@ class SDT_MNIST( SDT ):
                           depth,
                           lamda,
                           use_cuda )
+
+
+        def plot_filter( self ):
+            nnodes  = (2 ** self.depth) - 1
+            print( f'Inner nodes {self.inner_nodes[0]}; nnodes:{nnodes}' )
+            weights = [ self.inner_nodes[ 0 ].weight[ i, :-1 ].detach() for i in range( nnodes ) ]
+            w       = [ torch.reshape( weight, (28, 28) ) for weight in weights ]
+            fig, ax = plt.subplot_mosaic( [ range( nnodes) ] )
+            for node in range( nnodes ):
+                ax[node].imshow( w[node], cmap="gray" )
+                ax[node].set_title( f'Node {node}' )
+                ax[node].axis('off') 
+            plt.show()
             
+
         def plot( self, output, batch_size ) -> None:
             X_copy = self.leaf_nodes.weight.clone().to("cpu").detach()
             print( X_copy.size() )

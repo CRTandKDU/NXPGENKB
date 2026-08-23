@@ -5,6 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import datasets, transforms
 
+import matplotlib.pyplot as plt
+
 from SDT import SDT_MNIST
 
 
@@ -61,6 +63,16 @@ if __name__ == "__main__":
         shuffle=True,
     )
 
+    # Display image and label.
+    # train_features, train_labels = next(iter(train_loader))
+    # print(f"Feature batch shape: {train_features.size()}")
+    # print(f"Labels batch shape: {train_labels.size()}")
+    # img = train_features[0].squeeze()
+    # label = train_labels[0]
+    # plt.imshow(img, cmap="gray")
+    # plt.title( f"Label: {label}" )
+    # plt.show()
+
     # Utils
     best_testing_acc = 0.0
     testing_acc_list = []
@@ -99,6 +111,7 @@ if __name__ == "__main__":
                 print(msg.format(epoch, batch_idx, batch_size, loss, correct, batch_size))
                 training_loss_list.append(loss.cpu().data.numpy())
 
+        tree.plot_filter()
         tree.plot( output, batch_size )
 
         # Evaluating
