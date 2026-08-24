@@ -194,12 +194,38 @@ class SDT_MNIST( SDT ):
             print( f'Inner nodes {self.inner_nodes[0]}; nnodes:{nnodes}' )
             weights = [ self.inner_nodes[ 0 ].weight[ i, :-1 ].detach() for i in range( nnodes ) ]
             w       = [ torch.reshape( weight, (28, 28) ) for weight in weights ]
-            fig, ax = plt.subplot_mosaic( [ range( nnodes) ] )
-            for node in range( nnodes ):
-                ax[node].imshow( w[node], cmap="gray" )
-                ax[node].set_title( f'Node {node}' )
-                ax[node].axis('off') 
-            plt.show()
+            # fig, ax = plt.subplot_mosaic( [ range( nnodes) ] )
+            # for node in range( nnodes ):
+            #     ax[node].imshow( w[node], cmap="gray" )
+            #     ax[node].set_title( f'Node {node}' )
+            #     ax[node].axis('off')
+
+            beg = 0
+            seq = [ -1 for n in range(nnodes) ]
+            for depth in range( self.depth ) :
+                A = 2 ** (self.depth - depth)
+                for idx in range( 2 ** depth ):
+                    seq[ (idx * A) + (A - 1) // 2 ] = beg
+                    beg += 1
+            print( seq )
+
+  # (defun perm (nrows)
+  # "`ncols' odd, and `ncols' = 2^`nrows' - 1"
+  # (let* ((beg 0)
+  #        (ncols (1- (expt 2 nrows)))
+  #        (seq (make-list ncols -1)))
+  #   (dotimes (depth nrows seq)
+  #     (dotimes (id (expt 2 depth))
+  #       (setf (seq-elt seq (+ (* id (expt 2 (- nrows depth))) (/ (1- (expt 2 (- nrows depth))) 2)) ) beg)
+  #       (setq beg (1+ beg))))))
+  
+  # for depth in range( self.depth ):
+  #               beg, end = 0, 1
+  #               for node in range( beg, end ):
+  #                   ax = plt.subplot2grid( (self.depth, (2 ** self.depth) - 1),
+  #                                          (depth, ((2 ** self.depth) - 1) // 2
+                
+  #           plt.show()
             
 
         def plot( self, output, batch_size ) -> None:

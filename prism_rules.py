@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from pandas.api.types import is_numeric_dtype
+from contextlib import redirect_stdout
 
 import nxp_rules as nxp
 
@@ -196,12 +197,13 @@ class PrismRules:
         return rules_for_val
 
 
-    def __display_rules(self, df, target_col, rules_dict, display_stats, fmt='PRISM' ):
+    def __display_rules(self, df, target_col, rules_dict, display_stats,
+                        fmt='PRISM' ):
         if( 'PRISM' == fmt ):
             for target_val in rules_dict:
                 print()
                 print('........................................................................')
-                print(f"Target: {self.int_to_values_map[target_col][target_val]}")
+                print(f"* Target: {self.int_to_values_map[target_col][target_val]}")
                 print('........................................................................')
                 if len(rules_dict[target_val]) == 0 and display_stats:
                     print((f"  No rules imputed for target value {self.int_to_values_map[target_col][target_val]}. There "
@@ -212,7 +214,7 @@ class PrismRules:
                     else:
                         print(r.split("\n")[0])
         elif( 'NXP40Y' == fmt ):
-            print( '\n------- NXP 40y Rules -------\n' )
+            print( '\n# ------- NXP 40y Rules -------\n' )
             for target_val in rules_dict:
                 for r in rules_dict[target_val]:
                     print(r)
@@ -220,7 +222,8 @@ class PrismRules:
             pass
             
 
-    def get_prism_rules(self, df, target_col, display_stats=True, fmt='PRISM' ):
+    def get_prism_rules(self, df, target_col, display_stats=True,
+                        fmt='PRISM', outfile=None ):
         """
         Given a dataframe with a specified target column, find a set of rules that describe the patterns associated
         with the target column. The rules are displayed in a formatted form.
@@ -287,8 +290,13 @@ class PrismRules:
             rules_dict[target_val] = self.__get_rules_for_target_val(df, target_col, target_val, fmt)
             # nxp_rules_dict[target_val] = self.__get_nxp_rules_for_target_val(df, target_col, target_val)
 
-        self.__display_rules(df, target_col, rules_dict, display_stats, fmt)
-        # self.__display_nxp_rules(df, target_col, nxp_rules_dict)
+        if( None != outfile ):
+            with open( outfile, 'w') as f:
+                with redirect_stdout(f):
+                    self.__display_rules(df, target_col, rules_dict, display_stats, fmt)
+        else:
+            self.__display_rules(df, target_col, rules_dict, display_stats, fmt)            
+
 
         self.default_target = df[target_col].mode().values[0]
         self.target_column = target_col

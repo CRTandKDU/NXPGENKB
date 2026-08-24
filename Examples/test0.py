@@ -15,7 +15,8 @@ df['Y'] = data['target']
 print( df.info() )
 
 prism   = PrismRules( nbins=4 )
-r =  prism.get_prism_rules(df, 'Y', display_stats=False, fmt='NXP40Y' )
+r =  prism.get_prism_rules(df, 'Y', display_stats=False,
+                           fmt='NXP40Y', outfile=None )
 
 print( '\n------- Datatypes -------\n' )
 for col_name in df.columns:
