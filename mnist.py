@@ -23,12 +23,12 @@ if __name__ == "__main__":
     # Parameters
     input_dim = 28 * 28    # the number of input dimensions
     output_dim = 10        # the number of outputs (i.e., # classes on MNIST)
-    depth = 2              # tree depth, usually 5 to 7
+    depth = 3              # tree depth, usually 5 to 7
     lamda = 1e-3           # coefficient of the regularization term
     lr = 1e-3              # learning rate
     weight_decaly = 5e-4   # weight decay
     batch_size = 128       # batch size
-    epochs = 1 # 50            # the number of training epochs
+    epochs = 5 # 50            # the number of training epochs
     log_interval = 100     # the number of batches to wait before printing logs
     use_cuda = False       # whether to use GPU
 
@@ -111,8 +111,8 @@ if __name__ == "__main__":
                 print(msg.format(epoch, batch_idx, batch_size, loss, correct, batch_size))
                 training_loss_list.append(loss.cpu().data.numpy())
 
-        tree.plot_filter()
-        tree.plot( output, batch_size )
+        tree.plot_filter( f'Epoch={epoch} Correct={correct:03d}/{batch_size:03d}' )
+        # tree.plot( output, batch_size )
 
         # Evaluating
         tree.eval()

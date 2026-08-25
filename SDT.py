@@ -1,3 +1,5 @@
+import numpy as np
+
 import torch
 import torch.nn as nn
 
@@ -189,7 +191,63 @@ class SDT_MNIST( SDT ):
                           use_cuda )
 
 
-        def plot_filter( self ):
+        def _plot_tree(self, w, nnodes):
+            """Plot each internal tree node's weight image, laid out as a binary tree."""
+            n_grid_rows = 2 * self.depth + 2
+            n_grid_cols = 2 * (2 ** self.depth - 1)
+
+            seq = [-1] * nnodes
+            node = 0
+            for depth in range(self.depth):
+                span = 2 ** (self.depth - depth)
+                for idx in range(2 ** depth):
+                    hpos = idx * span + (span - 1) // 2
+                    seq[hpos] = node
+
+                    ax = plt.subplot2grid(
+                        (n_grid_rows, n_grid_cols),
+                        (2 * depth, 2 * hpos),
+                        rowspan=2, colspan=2,
+                    )
+                    ax.imshow(w[node], cmap='gray')
+                    ax.set_title(f'Node {node}')
+                    ax.axis('off')
+                    node += 1
+            print(seq)
+
+            self._plot_leaves(n_grid_rows, n_grid_cols)
+
+
+        def _plot_leaves(self, n_grid_rows, n_grid_cols):
+            """Plot each leaf's weight vector as a simple bar-chart image."""
+            X = self.leaf_nodes.weight.clone().detach().cpu().numpy()
+            n_rows, n_leaves = X.shape
+            half = n_rows // 2
+            leaf_grid_row = 2 * self.depth + 1
+
+            for leaf in range(n_leaves):
+                weights = X[:, leaf]
+                img = np.zeros((n_rows, n_rows))
+
+                for col, p in enumerate(weights):
+                    bar = int(p * half)
+                    if p >= 0:
+                        img[max(0, half - bar):half, col] = 1.0
+                    else:
+                        img[half:min(half - bar, n_rows), col] = 1.0
+
+                # Leaves are laid out in pairs under their parent node
+                # (this always uses span == 2, since that's the final value
+                # `A` took in the original loop above).
+                hleaf = 4 * (leaf // 2) + (leaf % 2)
+
+                ax = plt.subplot2grid((n_grid_rows, n_grid_cols), (leaf_grid_row, hleaf))
+                ax.imshow(img, cmap='Blues')
+                ax.axis('off')
+
+
+
+        def plot_filter( self, title ):
             nnodes  = (2 ** self.depth) - 1
             print( f'Inner nodes {self.inner_nodes[0]}; nnodes:{nnodes}' )
             weights = [ self.inner_nodes[ 0 ].weight[ i, :-1 ].detach() for i in range( nnodes ) ]
@@ -199,34 +257,48 @@ class SDT_MNIST( SDT ):
             #     ax[node].imshow( w[node], cmap="gray" )
             #     ax[node].set_title( f'Node {node}' )
             #     ax[node].axis('off')
+            #
+            # beg = 0
+            # seq = [ -1 for n in range(nnodes) ]
+            # for depth in range( self.depth ) :
+            #     A = 2 ** (self.depth - depth)
+            #     for idx in range( 2 ** depth ):
+            #         hpos =  (idx * A) + (A - 1) // 2 
+            #         seq[ hpos ] = beg
+            #         ax = plt.subplot2grid( (2 * self.depth + 2, 2 * ((2 ** self.depth) - 1)),
+            #                                (2 * depth,  2 * hpos),
+            #                                rowspan=2, colspan=2 )
+            #         ax.imshow( w[beg], cmap='gray' )
+            #         ax.set_title( f'Node {beg}' )
+            #         ax.axis( 'off' )
+            #         beg += 1
+            # print( seq )
+            # #
+            # X_copy = self.leaf_nodes.weight.clone().to("cpu").detach()
+            # leaves = X_copy.size()[1]
+            # x      = range( X_copy.size()[0] )
+            # half   = X_copy.size()[0] // 2
+            # dleaf  = 2 * self.depth + 1
+            # imleaf = [ [ [ 0.0 for _ in x ] for _ in x ]  for _ in range( leaves ) ]
+            # for leaf in range( leaves ):
+            #     for p, i in zip( X_copy[ :, leaf ], x ) :
+            #         if p >= 0.0 :
+            #             for j in range( max( 0, int( half - p*half )), half ):
+            #                 imleaf[leaf][j][i] = 1.0
+            #         else:
+            #             for j in range( half, min( int( half - p*half ), X_copy.size()[0] )  ):
+            #                 imleaf[leaf][j][i] = 1.0
+            #     hleaf = 2 * (((leaf // 2) * A) + ((A - 1) // 2)) + ( leaf % 2 ) # WARNING: Use last value of A
+            #     ax = plt.subplot2grid( (2 * self.depth + 2, 2 * ((2 ** self.depth) - 1)),
+            #                            ( dleaf, hleaf ) )
+            #     ax.imshow( imleaf[leaf], cmap='Blues' )
+            #     ax.axis( 'off' )
+            #
+            # Refactored by Claude on Tuesday, August 25, 2026
+            self._plot_tree( w, nnodes )
+            plt.gcf().suptitle( title )    
+            plt.show()
 
-            beg = 0
-            seq = [ -1 for n in range(nnodes) ]
-            for depth in range( self.depth ) :
-                A = 2 ** (self.depth - depth)
-                for idx in range( 2 ** depth ):
-                    seq[ (idx * A) + (A - 1) // 2 ] = beg
-                    beg += 1
-            print( seq )
-
-  # (defun perm (nrows)
-  # "`ncols' odd, and `ncols' = 2^`nrows' - 1"
-  # (let* ((beg 0)
-  #        (ncols (1- (expt 2 nrows)))
-  #        (seq (make-list ncols -1)))
-  #   (dotimes (depth nrows seq)
-  #     (dotimes (id (expt 2 depth))
-  #       (setf (seq-elt seq (+ (* id (expt 2 (- nrows depth))) (/ (1- (expt 2 (- nrows depth))) 2)) ) beg)
-  #       (setq beg (1+ beg))))))
-  
-  # for depth in range( self.depth ):
-  #               beg, end = 0, 1
-  #               for node in range( beg, end ):
-  #                   ax = plt.subplot2grid( (self.depth, (2 ** self.depth) - 1),
-  #                                          (depth, ((2 ** self.depth) - 1) // 2
-                
-  #           plt.show()
-            
 
         def plot( self, output, batch_size ) -> None:
             X_copy = self.leaf_nodes.weight.clone().to("cpu").detach()
