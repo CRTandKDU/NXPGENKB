@@ -1,3 +1,5 @@
+# PRISM on datasets from the UCI repo
+from ucimlrepo import fetch_ucirepo 
 import pandas as pd
 import numpy as np
 from sklearn.datasets import make_classification, make_blobs, fetch_openml
@@ -7,15 +9,25 @@ import sys
 sys.path.append('../')
 from prism_rules import PrismRules
 
-data    = datasets.load_wine()
-df      = pd.DataFrame(data.data, columns=data.feature_names)
-df['Y'] = data['target']
+uci_data = fetch_ucirepo(id=60) 
+print( uci_data.data.features )
+print( uci_data.data.targets )
+
+df = pd.concat( [ pd.DataFrame( uci_data.data.features ),
+                  pd.DataFrame( uci_data.data.targets ) ],
+                axis=1 )
+
+# df      = pd.DataFrame(data.data, columns=data.feature_names)
+# df['Y'] = data['target']
 
 
 print( df.info() )
 
-prism   = PrismRules( nbins=3 )
-r =  prism.get_prism_rules(df, 'Y', display_stats=False,
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
+#     print(df)
+
+prism   = PrismRules( nbins=3, verbose=1 )
+r =  prism.get_prism_rules(df, 'drinks', display_stats=False,
                            fmt='NXP40Y', outfile=None )
 
 print( '\n------- Datatypes -------\n' )

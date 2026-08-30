@@ -222,7 +222,7 @@ class PrismRules:
             pass
             
 
-    def get_prism_rules(self, df, target_col, display_stats=True,
+    def get_prism_rules(self, uci_df, target_col, display_stats=True,
                         fmt='PRISM', outfile=None ):
         """
         Given a dataframe with a specified target column, find a set of rules that describe the patterns associated
@@ -234,10 +234,17 @@ class PrismRules:
         :return: array of strings, with each element of the array representing one rule.
         """
 
+        df = uci_df
+
         # PRISM requires all columns be categorical, so bin any numeric features, including the target column if
         # necessary.
         new_vals_dict = {}
         for col_name in df.columns:
+
+            # print( f'\t{col_name} uniques={df[col_name].nunique()}' )
+            # if( 'drinks' == col_name ):
+            #     print( 'Uniques', list( df[col_name].unique() ) )
+
             if is_numeric_dtype(df[col_name]) and (df[col_name].nunique() > 10):
                 try:
                     if self.nbins == 3:
