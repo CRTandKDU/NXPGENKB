@@ -296,6 +296,8 @@ class PrismRules:
                 print(f"Determining rules for target class: {self.int_to_values_map[target_col][target_val]}")
             rules_dict[target_val] = self.__get_rules_for_target_val(df, target_col, target_val, fmt)
             # nxp_rules_dict[target_val] = self.__get_nxp_rules_for_target_val(df, target_col, target_val)
+            if self.verbose >= 1:
+                print( f"Total {len( rules_dict[target_val] )} rules" )
 
         if( None != outfile ):
             with open( outfile, 'w') as f:
