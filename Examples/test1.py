@@ -1,4 +1,12 @@
-# PRISM on datasets from the UCI repo
+    #  _______________________________ 
+    # < Rule-Learning on UCI datasets >
+    #  ------------------------------- 
+    #         \   ^__^
+    #          \  (oo)\_______
+    #             (__)\       )\/\
+    #                 ||----w |
+    #                 ||     ||
+
 import argparse
 from ucimlrepo import fetch_ucirepo 
 import pandas as pd
