@@ -1,4 +1,5 @@
 """Training and evaluating a soft decision tree on the MNIST dataset."""
+import time
 
 import torch
 import torch.nn as nn
@@ -21,20 +22,22 @@ def onehot_coding(target, device, output_dim):
 if __name__ == "__main__":
 
     # Parameters
-    input_dim = 28 * 28    # the number of input dimensions
-    output_dim = 10        # the number of outputs (i.e., # classes on MNIST)
-    depth = 3              # tree depth, usually 5 to 7
-    lamda = 1e-3           # coefficient of the regularization term
-    lr = 1e-3              # learning rate
-    weight_decaly = 5e-4   # weight decay
-    batch_size = 128       # batch size
-    epochs = 5 # 50            # the number of training epochs
-    log_interval = 100     # the number of batches to wait before printing logs
-    use_cuda = False       # whether to use GPU
+    input_dim     = 28 * 28   # the number of input dimensions
+    output_dim    = 10        # the number of outputs (i.e., # classes on MNIST)
+    depth         = 3         # tree depth, usually 5 to 7
+    lamda         = 1e-3      # coefficient of the regularization term
+    lr            = 1e-3      # learning rate
+    weight_decay  = 5e-4      # weight decay
+    batch_size    = 128       # batch size
+    epochs        = 5 # 50    # the number of training epochs
+    log_interval  = 100       # the number of batches to wait before printing logs
+    use_cuda      = False     # whether to use GPU
 
     # Model and Optimizer
-    tree = SDT_MNIST(input_dim, output_dim, depth, lamda, use_cuda)
-
+    tree = SDT_MNIST(input_dim, output_dim,
+                     depth=depth, lamda=lamda, use_cuda=use_cuda)
+    print( f'SDT Torch device={tree.device}' )
+    
     optimizer = torch.optim.Adam(tree.parameters(),
                                  lr=lr,
                                  weight_decay=weight_decaly)
@@ -74,15 +77,15 @@ if __name__ == "__main__":
     # plt.show()
 
     # Utils
-    best_testing_acc = 0.0
-    testing_acc_list = []
+    best_testing_acc   = 0.0
+    testing_acc_list   = []
     training_loss_list = []
-    criterion = nn.CrossEntropyLoss()
-    device = torch.device("cuda" if use_cuda else "cpu")
-
+    criterion          = nn.CrossEntropyLoss()
+    device             = torch.device("cuda" if use_cuda else "cpu")
+    
     for epoch in range(epochs):
-
-        # Training
+        epoch_st = time.time()
+        batch_st = time.time()
         tree.train()
         for batch_idx, (data, target) in enumerate(train_loader):
 
@@ -101,17 +104,22 @@ if __name__ == "__main__":
 
             # Print training status
             if batch_idx % log_interval == 0:
+                batch_et = time.time()
                 pred = output.data.max(1)[1]
                 correct = pred.eq(target.view(-1).data).sum()
 
                 msg = (
                     "Epoch: {:02d} | Batch: {:03d} (Size: {:03d}) | Loss: {:.5f} |"
-                    " Correct: {:03d}/{:03d}"
+                    " Correct: {:03d}/{:03d} Elapsed: {:.2f}"
                 )
-                print(msg.format(epoch, batch_idx, batch_size, loss, correct, batch_size))
+                print(msg.format(epoch, batch_idx, batch_size, loss, correct, batch_size, batch_et - batch_st ))
                 training_loss_list.append(loss.cpu().data.numpy())
+                batch_st = time.time()
 
-        tree.plot_filter( f'Epoch={epoch} Correct={correct:03d}/{batch_size:03d}' )
+        epoch_et = time.time()
+        print( f'Epoch={epoch} ELapsed: {epoch_et - epoch_st :.2f}' )
+
+        # tree.plot_filter( f'Epoch={epoch} Correct={correct:03d}/{batch_size:03d}' )
         # tree.plot( output, batch_size )
 
         # Evaluating
@@ -132,7 +140,7 @@ if __name__ == "__main__":
 
         if accuracy > best_testing_acc:
             best_testing_acc = accuracy
-
+            
         msg = (
             "\nEpoch: {:02d} | Testing Accuracy: {}/{} ({:.3f}%) |"
             " Historical Best: {:.3f}%\n"

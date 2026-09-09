@@ -167,13 +167,26 @@ def nxp__paths_to_kb( paths ):
         print( f'THEN HYPO_{path['class']}' )
         print( '#+END_RULE\n' )
 
+
+def nxp__df_infos( df, heading ):
+    if df is not None :
+        print( f'* {heading}' )
+        print( df.info() )
+
         
-def nxp_dtclf_to_kb( model, outfile=None ):
+def nxp_dtclf_to_kb( model,
+                     df_f = None,
+                     df_t = None,
+                     outfile=None ):
     paths = nxp__get_leaf_conditions( model )
     #
     if( None != outfile ):
         with open( outfile, 'w') as f:
             with redirect_stdout(f):
+                nxp__df_infos( df_f, 'Dataset Features' )
+                nxp__df_infos( df_t, 'Dataset Targets' )
                 nxp__paths_to_kb( paths )
     else:
+        nxp__df_infos( df_f, 'Dataset Features' )
+        nxp__df_infos( df_t, 'Dataset Targets' )
         nxp__paths_to_kb( paths )

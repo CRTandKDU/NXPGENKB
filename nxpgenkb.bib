@@ -2,11 +2,11 @@
 @inproceedings{Swartout1981,
 author = {Swartout, William},
 booktitle = {Seventh International Joint Conference on Artificial Intelligence},                  
-year = {1981},
-month = {01},
+year = 1981,
+month = 01,
 pages = {815-823},
 publisher = {William Kaufmann, Inc.},
-title = {Explaining and Justifying Expert Consulting Programs},
+title = {{Explaining and Justifying Expert Consulting Programs}},
 isbn = {978-1-4612-9567-9},
 doi = {10.1007/978-1-4612-5108-8_15}
 }
@@ -14,7 +14,7 @@ doi = {10.1007/978-1-4612-5108-8_15}
 @ARTICLE{Swartout1991,
   author={Swartout, W. and Paris, C. and Moore, J.},
   journal={IEEE Expert}, 
-  title={Explanations in knowledge systems: design for explainable expert systems}, 
+  title={{Explanations in knowledge systems: design for explainable expert systems}}, 
   year=1991,
   volume=6,
   number=3,
@@ -84,6 +84,28 @@ doi = {10.1007/978-1-4612-5108-8_15}
 
 
 @Comment RULE LEARNING
+@article{Lu_2025,
+   title={{Knowledge Distillation Decision Tree for Unravelling Black-Box Machine Learning Models}},
+   ISSN={2693-7166},
+   url={http://dx.doi.org/10.51387/25-NEJSDS84},
+   DOI={10.51387/25-nejsds84},
+   journal={The New England Journal of Statistics in Data Science},
+   publisher={New England Statistical Society},
+   author={Lu, Xuetao and Lee, J. Jack},
+   year=2025,
+   month=Jan, pages={135–158}
+}
+
+@article{Araballi2026,
+  title={{Distilling Deep Reinforcement Learning into Interpretable Fuzzy Rules: An Explainable AI Framework}},
+  author={Sanup Araballi and Simon Khan and Chilukuri K. Mohan},
+  journal={ArXiv},
+  year=2026,
+  note={See Coppens2019},
+  volume={abs/2603.13257},
+  url={https://api.semanticscholar.org/CorpusID:286568695}
+}
+
 @techreport{Furnkranz2003,
   title = "An Analysis of Rule Learning Heuristics",
   abstract = "In this paper we analyze the most popular search heuristics for separate-andconquer rule learning algorithms. Our results show that all commonly used heuristics, including accuracy, weighted relative accuracy, entropy, Gini index and information gain, are equivalent to one of two fundamental prototypes: precision, which tries to optimize the area under the ROC curve for unknown costs, and a cost-eighted difference between covered positive and negative examples, which tries to find the optimal point under known or assumed costs. We also show that a straight-forward generalization of the m-heuristic is a means for trading off between these two prototypes.",
@@ -134,9 +156,10 @@ note = "Other page information: -20 Other identifier: 1000694",
 @Comment DISTILLING TO SOFT DECISION TREE                  
 @article{Frosst2017,
   author       = {Frosst, Nicholas and Hinton, Geoffrey},
-  title	       = {Distilling a Neural Network Into a Soft Decision
-                  Tree},
+  title	       = {{Distilling a Neural Network Into a Soft Decision
+                  Tree}},
   year	       = 2017,
+  journal      = {CoRR},
   doi	       = {10.48550/ARXIV.1711.09784},
   url	       = {https://arxiv.org/abs/1711.09784},
   keywords     = {Machine Learning (cs.LG), Artificial Intelligence
@@ -164,6 +187,20 @@ note = "Other page information: -20 Other identifier: 1000694",
   url = "https://sites.google.com/view/xai2019/home",
 }
 
+@article{Puiutta2020,
+  author       = {Erika Puiutta and
+                  Eric M. S. P. Veith},
+  title        = {{Explainable Reinforcement Learning: A Survey}},
+  journal      = {CoRR},
+  volume       = {abs/2005.06247},
+  year         = 2020,
+  url          = {https://arxiv.org/abs/2005.06247},
+  eprinttype   = {arXiv},
+  eprint       = {2005.06247},
+  timestamp    = {Thu, 14 May 2020 16:56:02 +0200},
+  biburl       = {https://dblp.org/rec/journals/corr/abs-2005-06247.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
 
 @Comment DEVELOPMENTS
 @article{Tanno2018,
@@ -210,3 +247,59 @@ note = "Other page information: -20 Other identifier: 1000694",
   pages     = {139-146},
   url       = {https://mlanthology.org/icml/2002/ferri2002icml-learning/}
 }
+
+@Comment ** Philosophical Thread
+@incollection{Scriven1962,
+    author    = {Scriven, Michael},
+    title     = {{Explanations, Predictions, and Laws}},
+    booktitle = {Scientific Explanation, Space, and Time},
+    series    = {Minnesota Studies in the Philosophy of Science},
+    volume    = 3,
+    editor    = {Feigl, Herbert and Maxwell, Grover},
+    pages     = {170--230},
+    publisher = {University of Minnesota Press},
+    address   = {Minneapolis},
+    year      = 1962
+}
+
+@incollection{Cohnitz2002,
+  author    = {Daniel Cohnitz},
+  title     = {{Explanations are like salted peanuts. Why you can't cut the route toward further reduction}},
+  booktitle = {Argument und Analyse: Sektionsvorträge / GAP.4, Münster 2002},
+  editor    = {Ansgar Beckermann and Christian Nimtz},
+  publisher = {Mentis},
+  year      = 2002,
+  address   = {Paderborn}
+}
+
+@article{Dolan1967,
+  author    = {Dolan, John M.},
+  title     = {A Note on Quine's Theory of Radical Translation},
+  journal   = {Mechanical Translation and Computational Linguistics},
+  volume    = {10},
+  number    = {1--2},
+  pages     = {26--37},
+  year      = {1967}
+}
+                  
+@Comment ** Technical Thread
+@misc{mccoy2026,
+      title={{The Emergent Symbolic Structure of Artificial Neural Networks}}, 
+      author={R. Thomas McCoy and Paul Soulos and Tal Linzen and Paul Smolensky},
+      year=2026,
+      eprint={2608.29530},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2608.29530}, 
+}
+
+@misc{hu2023,
+      title={{Teacher-Student Architecture for Knowledge Distillation: A Survey}}, 
+      author={Chengming Hu and Xuan Li and Dan Liu and Haolun Wu and Xi Chen and Ju Wang and Xue Liu},
+      year=2023,
+      eprint={2308.04268},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2308.04268}, 
+}
+ 

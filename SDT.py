@@ -75,12 +75,12 @@ class SDT(nn.Module):
         # Initialize internal nodes and leaf nodes, the input dimension on
         # internal nodes is added by 1, serving as the bias.
         self.inner_nodes = nn.Sequential(
-            nn.Linear(self.input_dim + 1, self.internal_node_num_, bias=False),
+            nn.Linear(self.input_dim + 1, self.internal_node_num_, bias=False, device=self.device),
             nn.Sigmoid(),
         )
 
-        self.leaf_nodes = nn.Linear(self.leaf_node_num_,
-                                    self.output_dim,
+        self.leaf_nodes = nn.Linear(self.leaf_node_num_, self.output_dim,
+                                    device=self.device,
                                     bias=False)
 
     def forward(self, X, is_training_data=False):
