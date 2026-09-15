@@ -5,18 +5,15 @@ import nlunar
 
 class LLenv( gym.Env ):
     def __init__( self ):
-        self._agent_location    = np.array( [ 65, 504, 150 ], dtype=np.int64 )
-        self._target_location   = np.array( [ 0, 0, 10 ], dtype=np.int64 )
+        self._state = np.array( [ 65, 504, 150 ], dtype=np.int64 )
+
         # Define what the agent can observe
         # Dict space gives us structured, human-readable observations
         self.observation_space = gym.spaces.Dict(
             {
-                "agent":  gym.spaces.Box( low   = np.array([-5000,-100,-1000]),
-                                          high  = np.array([5000,5000,200]),
-                                          dtype = np.int64 ),
-                "target": gym.spaces.Box( low   = np.array([-500,0,0]),
-                                          high  = np.array([500,5000,200]),
-                                          dtype = np.int64 )
+                "status":  gym.spaces.Box( low   = np.array([ -500, -100, -100]),
+                                           high  = np.array([ 5000, 5000, 1000]),
+                                           dtype = np.int64 ) 
             }
         )
         # Define what actions are available (5 units increment up to 100)
@@ -28,7 +25,7 @@ class LLenv( gym.Env ):
         Returns:
             dict: Observation with agent and target positions
         """
-        return {"agent": self._agent_location, "target": self._target_location}
+        return {"status": self._state}
         
     def _get_info(self):
         """Compute auxiliary information for debugging.
@@ -37,9 +34,10 @@ class LLenv( gym.Env ):
             dict: Info with distance between agent and target
         """
         return {
-            "distance": np.linalg.norm(
-                self._agent_location - self._target_location, ord=1
-            )
+            "speed":    self._state[0],
+            "altitude": self._state[1],
+            "reserve":  self._state[2],
+            "energy":   self._state[0] * self._state[0] + (self._state[1] * self._state[1]) 
         }
     
     def reset(self, seed = None, options = None):
@@ -56,10 +54,10 @@ class LLenv( gym.Env ):
         super().reset(seed=seed)
 
         # Randomly place the agent anywhere on the grid
-        self._agent_location = np.array( [ 65, 504, 150 ], dtype=np.int64 )
+        self._state = np.array( [ 65, 504, 150 ], dtype=np.int64 )
 
         # Randomly place target, ensuring it's different from agent position
-        self._target_location   = np.array( [ 0, 0, 10 ], dtype=np.int64 )
+        # self._target_location   = np.array( [ 0, 0, 10 ], dtype=np.int64 )
         # self._target_location = self._agent_location
         # while np.array_equal(self._target_location, self._agent_location):
         #     self._target_location = self.np_random.integers(
@@ -67,7 +65,7 @@ class LLenv( gym.Env ):
         #     )
 
         observation = self._get_obs()
-        info = self._get_info()
+        info        = self._get_info()
         return observation, info
         
 
@@ -80,11 +78,17 @@ class LLenv( gym.Env ):
         Returns:
             tuple: (observation, reward, terminated, truncated, info)
         """
-        self._agent_location = nlunar.f_state( self._agent_location, action )
-        res                  = nlunar.ok_state( self._agent_location )
-        terminated  = (1 == res)
-        truncated   = True if 0 == res else False
-        reward      = 1 if terminated else -0.01 if 0 == res else -1
+        if 5*action > self._state[2]:
+            terminated = False
+            truncated  = False
+            reward     = -1
+        else:
+            self._state = nlunar.f_state( self._state, 5*action )
+            res         = nlunar.ok_state( self._state )
+            terminated  = (1 == res) or (0 == res)
+            truncated   = False
+            reward      = 1 if 1 == res else -.1 if 0 == res else -.01 
+
         observation = self._get_obs()
         info        = self._get_info()
 
@@ -95,5 +99,5 @@ class LLenv( gym.Env ):
 gym.register(
     id                = "LunarLandingHP-25",
     entry_point       = LLenv,
-    max_episode_steps = 20,  # Prevent infinite episodes
+    max_episode_steps = 2000,  # Prevent infinite episodes
 )

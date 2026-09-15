@@ -70,9 +70,9 @@ class DQN(nn.Module):
             x1 = F.relu(self.layer1(x))
             x2 = F.relu(self.layer2(x1))
             x3 = self.layer3(x2)
-            x = x3
-        except RuntimeError:
-            print( f'Error in forward, {x}' )
+            x  = x3
+        except RuntimeError as exc:
+            print( f'Error in forward, {x}: {exc}' )
         return x
 
 
@@ -112,7 +112,7 @@ def plot_durations(show_result=False):
         means = torch.cat((torch.zeros(99), means))
         plt.plot(means.numpy())
 
-    plt.pause(0.001)  # pause a bit so that plots are updated
+    plt.pause(0.0005)  # pause a bit so that plots are updated
     if is_ipython:
         if not show_result:
             display.display(plt.gcf())
@@ -143,9 +143,9 @@ def optimize_model():
     # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
     # columns of actions taken. These are the actions which would've been taken
     # for each batch state according to policy_net
-    print( 'State batch', len(state_batch) )
-    print( 'Action batch', len(action_batch) )
-    print( 'Reward batch', len(reward_batch) )
+    # print( 'State batch', len(state_batch) )
+    # print( 'Action batch', len(action_batch), action_batch )
+    # print( 'Reward batch', len(reward_batch) )
 
     state_action_values = policy_net(state_batch).gather(1, action_batch)
 
@@ -198,7 +198,7 @@ if __name__ == "__main__":
     n_actions      = env.action_space.n
     # Get the number of state observations
     state, info    = env.reset()
-    n_observations = len(state)
+    n_observations = len(state['status'])
 
     policy_net     = DQN(n_observations, n_actions).to(device)
     target_net     = DQN(n_observations, n_actions).to(device)
@@ -217,16 +217,16 @@ if __name__ == "__main__":
     else:
         num_episodes = 50
 
-    num_episodes = 50
+    # num_episodes = 300
 
     for i_episode in range(num_episodes):
         # Initialize the environment and get its state
         state, info = env.reset()
-        state = state['agent']
+        state = state['status']
         state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
         for t in count():
-            action = 5 * select_action(state)
-            print( f'episode={i_episode}, count={t}, state={state}, action={action}' )
+            action = select_action(state)
+            # print( f'episode={i_episode}, count={t}, state={state}, action={action}' )
             observation, reward, terminated, truncated, _ = env.step(action.item())
             reward = torch.tensor([reward], device=device)
             done = terminated or truncated
@@ -234,7 +234,7 @@ if __name__ == "__main__":
             if terminated:
                 next_state = None
             else:
-                next_state = torch.tensor(observation['agent'], dtype=torch.float32, device=device).unsqueeze(0)
+                next_state = torch.tensor(observation['status'], dtype=torch.float32, device=device).unsqueeze(0)
 
             # Store the transition in memory
             memory.push(state, action, next_state, reward)
@@ -262,3 +262,28 @@ if __name__ == "__main__":
     plot_durations(show_result=True)
     plt.ioff()
     plt.show()
+    #
+    episode = []
+    state, info = env.reset()
+    state = state['status']
+    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+    for t in count():
+        action = select_action(state)
+        episode += [( state, action )]
+        # print( f'episode={i_episode}, count={t}, state={state}, action={action}' )
+        observation, reward, terminated, truncated, _ = env.step(action.item())
+        reward = torch.tensor([reward], device=device)
+        done = terminated or truncated
+
+        if terminated:
+            next_state = None
+        else:
+            next_state = torch.tensor(observation['status'], dtype=torch.float32, device=device).unsqueeze(0)
+
+        # Move to the next state
+        state = next_state
+        if done:
+            break
+    print( episode )
+    print( reward )
+    print( torch.tensor(observation['status'], dtype=torch.float32, device=device).unsqueeze(0) )

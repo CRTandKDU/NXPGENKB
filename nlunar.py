@@ -37,7 +37,7 @@ def ok_state( state ):
     # Landed
     if( state[1] <= _adjust and state[0] <= _tolerance ):
         return 1
-    # In flight
+    # In flight w. reserve
     return 2
 
 def play_seq( s0, commands ):
