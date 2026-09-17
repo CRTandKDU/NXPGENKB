@@ -35,7 +35,7 @@ def ok_state( state ):
     if( 0 == state[2] and state[0] > _tolerance ):
         return 0
     # Landed
-    if( state[1] <= _adjust and state[0] <= _tolerance ):
+    if( abs(state[1]) <= _adjust and abs(state[0]) <= _tolerance ):
         return 1
     # In flight w. reserve
     return 2
@@ -62,11 +62,12 @@ if __name__ == "__main__":
     #                    np.array( [ 25, 0, 0, 0, 0, 0], dtype=np.int64 ) )
     # print( f'Final state: {s} ({res})' )
     #
-    s, res = play_inv_seq( np.array( [0, 0, 10], dtype=np.int64 ),
-                           np.array( [25, 25, 25, 25, 0, 0, 0, 0, 10], dtype = np.int64 ) )
-    print( f'Initial state: {s} ({res})' )
-    s, res = play_seq( np.array( [65, 501, 120], dtype=np.int64 ),
-                       np.flip( np.array( [25, 25, 25, 25, 0, 0, 0, 0, 10], dtype = np.int64 ) ) )
+    # s, res = play_inv_seq( np.array( [0, 0, 10], dtype=np.int64 ),
+    #                        np.array( [25, 25, 25, 25, 0, 0, 0, 0, 10], dtype = np.int64 ) )
+    # print( f'Initial state: {s} ({res})' )
+    s, res = play_seq( np.array( [65, 504, 200], dtype=np.int64 ),
+                       np.array( [0, 0, 0, 0, 20, 25, 25, 20, 25, 0, 0, 15, 0, 0, 15, 0, 0, 10], dtype=np.int64 ) )
+                       # np.array( [0, 0, 0, 0, 20, 25, 25, 20, 25, 0], dtype = np.int64 ) ) 
     print( f'Final state: {s} ({res})' )
                        
     

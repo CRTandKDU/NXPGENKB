@@ -17,7 +17,7 @@ class LLenv( gym.Env ):
             }
         )
         # Define what actions are available (5 units increment up to 100)
-        self.action_space = gym.spaces.Discrete( 20 )
+        self.action_space = gym.spaces.Discrete( 5 )
 
     def _get_obs(self):
         """Convert internal state to observation format.
@@ -79,19 +79,19 @@ class LLenv( gym.Env ):
             tuple: (observation, reward, terminated, truncated, info)
         """
         if 5*action > self._state[2]:
-            terminated = False
+            terminated = True
             truncated  = False
-            reward     = -1
+            # reward     = -1
         else:
             self._state = nlunar.f_state( self._state, 5*action )
             res         = nlunar.ok_state( self._state )
             terminated  = (1 == res) or (0 == res)
             truncated   = False
-            reward      = 1 if 1 == res else -.1 if 0 == res else -.01 
+            # reward      = 1 if 1 == res else -1 if 0 == res else -.01 
 
         observation = self._get_obs()
         info        = self._get_info()
-
+        reward      = 0. - info['energy']
         return observation, reward, terminated, truncated, info
 
     
@@ -99,5 +99,5 @@ class LLenv( gym.Env ):
 gym.register(
     id                = "LunarLandingHP-25",
     entry_point       = LLenv,
-    max_episode_steps = 2000,  # Prevent infinite episodes
+    max_episode_steps = 1000,  # Prevent infinite episodes
 )

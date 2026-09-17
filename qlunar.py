@@ -38,6 +38,7 @@ device = torch.device( "cpu" )
 Transition = namedtuple('Transition',
                         ('state', 'action', 'next_state', 'reward'))
 
+NUMPARAMS = 512
 
 class ReplayMemory(object):
 
@@ -59,9 +60,9 @@ class DQN(nn.Module):
 
     def __init__(self, n_observations, n_actions):
         super(DQN, self).__init__()
-        self.layer1 = nn.Linear(n_observations, 128)
-        self.layer2 = nn.Linear(128, 128)
-        self.layer3 = nn.Linear(128, n_actions)
+        self.layer1 = nn.Linear(n_observations, NUMPARAMS)
+        self.layer2 = nn.Linear(NUMPARAMS, NUMPARAMS)
+        self.layer3 = nn.Linear(NUMPARAMS, n_actions)
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
@@ -185,7 +186,7 @@ if __name__ == "__main__":
     # TAU is the update rate of the target network
     # LR is the learning rate of the ``AdamW`` optimizer
 
-    BATCH_SIZE = 128
+    BATCH_SIZE = NUMPARAMS
     GAMMA      = 0.99
     EPS_START  = 0.9
     EPS_END    = 0.01
@@ -213,7 +214,7 @@ if __name__ == "__main__":
     print( f'n_actions={n_actions}, n_observations={n_observations}, state={state}' )
 
     if torch.cuda.is_available() or torch.backends.mps.is_available():
-        num_episodes = 600
+        num_episodes = 1000
     else:
         num_episodes = 50
 
@@ -227,7 +228,7 @@ if __name__ == "__main__":
         for t in count():
             action = select_action(state)
             # print( f'episode={i_episode}, count={t}, state={state}, action={action}' )
-            observation, reward, terminated, truncated, _ = env.step(action.item())
+            observation, reward, terminated, truncated, info = env.step(action.item())
             reward = torch.tensor([reward], device=device)
             done = terminated or truncated
 
@@ -254,7 +255,8 @@ if __name__ == "__main__":
             target_net.load_state_dict(target_net_state_dict)
 
             if done:
-                episode_durations.append(t + 1)
+                # episode_durations.append(t + 1)
+                episode_durations.append( math.sqrt( info['energy'] ) )
                 plot_durations()
                 break
 
@@ -287,3 +289,5 @@ if __name__ == "__main__":
     print( episode )
     print( reward )
     print( torch.tensor(observation['status'], dtype=torch.float32, device=device).unsqueeze(0) )
+    #
+    env.close()
